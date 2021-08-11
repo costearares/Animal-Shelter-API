@@ -6,9 +6,9 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
+@Entity
 public class AnimalShelter {
-/*
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -16,11 +16,11 @@ public class AnimalShelter {
     private String name;
 
     // unidirectional OneToMany
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+/*    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "shelter_id")
-    private List<Cat> cats = new ArrayList<>();
+    private List<Cat> cats = new ArrayList<>();*/
 
-
+/*
     //    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     //    @JoinColumn(name = "cat_id")
     //    private Cat cat;
@@ -34,15 +34,15 @@ public class AnimalShelter {
     //               joinColumns = @JoinColumn(name = "shelter_id", referencedColumnName = "id"),
     //               inverseJoinColumns = @JoinColumn(name = "cat_id", referencedColumnName = "id"))
     //    private List<Cat> catss = new ArrayList<>();
-
+*/
     public Integer getId() {
         return id;
     }
 
     public AnimalShelter setId(Integer id) {
         this.id = id;
-        return this;*/
-  /*  }
+        return this;
+    }
 
     public String getName() {
         return name;
@@ -51,5 +51,5 @@ public class AnimalShelter {
     public AnimalShelter setName(String name) {
         this.name = name;
         return this;
-    }*/
+    }
 }

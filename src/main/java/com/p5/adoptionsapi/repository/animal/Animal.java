@@ -21,6 +21,15 @@ public class Animal {
     private String name;
     private String photo;
 
+    public Animal(Long id, String name, String photo) {
+        this.id = id;
+        this.name = name;
+        this.photo = photo;
+    }
+
+    public Animal() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -46,5 +55,14 @@ public class Animal {
     public Animal setPhoto(String photo) {
         this.photo = photo;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Animal{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", photo='" + photo + '\'' +
+                '}';
     }
 }
