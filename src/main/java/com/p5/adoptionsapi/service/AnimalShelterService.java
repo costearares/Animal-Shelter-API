@@ -1,6 +1,7 @@
 package com.p5.adoptionsapi.service;
 
 import com.p5.adoptionsapi.repository.cats.Cat;
+import com.p5.adoptionsapi.repository.dogs.Dog;
 import com.p5.adoptionsapi.repository.shelters.AnimalShelter;
 import com.p5.adoptionsapi.repository.shelters.AnimalShelterRepository;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,7 @@ public class AnimalShelterService {
         return optional.orElseThrow(() -> new EntityNotFoundException("Shelter with id " + id + "not found"));
     }
 
+
 //CRUD for Cat
 
     public List<Cat> findAllCatsByShelter(Integer id) {
@@ -100,5 +102,47 @@ public class AnimalShelterService {
     }
 
 
-    //CRUD  for Dog
+//CRUD  for Dog
+
+    public List<Dog> findAllDogByShelter(Integer id) {
+        AnimalShelter shelter = getShelterById(id);
+        return shelter.getDogs();
+    }
+
+
+    public List<Dog> findDogById(Integer shelterId, Integer dogId) {
+        AnimalShelter shelter = getShelterById(shelterId);
+        List<Dog> newDog = shelter.getDogs().stream().filter(c ->
+                c.getId().equals(dogId)).collect(Collectors.toList());
+        return newDog;
+    }
+
+    public List<Dog> addNewDog(Integer shelterId, Dog dog) {
+        AnimalShelter shelter = getShelterById(shelterId);
+        shelter.getDogs().add(dog);
+        animalShelterRepository.save(shelter);
+        return shelter.getDogs();
+    }
+
+
+    public void deleteDogById(Integer shelterId, Integer dogId) {
+        AnimalShelter shelter = getShelterById(shelterId);
+        List<Dog> newDogs = shelter.getDogs().stream().filter(c -> !c.getId().equals(dogId)).collect(Collectors.toList());
+        shelter.setDogs(newDogs);
+        animalShelterRepository.save(shelter);
+    }
+
+    public Dog updateDogInShelter(Integer shelterId, Integer dogId, Dog dog) {
+        AnimalShelter shelter = getShelterById(shelterId);
+        List<Dog> newDogs = shelter.getDogs().stream().map(c -> {
+            if (c.getId().equals(dogId)) {
+                dog.setId(dogId);
+                return dog;
+            }
+            return c;
+        }).collect(Collectors.toList());
+        shelter.setDogs(newDogs);
+        animalShelterRepository.save(shelter);
+        return dog;
+    }
 }
