@@ -4,6 +4,13 @@ import com.p5.adoptionsapi.repository.cats.Cat;
 import com.p5.adoptionsapi.repository.dogs.Dog;
 import com.p5.adoptionsapi.repository.shelters.AnimalShelter;
 import com.p5.adoptionsapi.repository.shelters.AnimalShelterRepository;
+import com.p5.adoptionsapi.service.DTO.CatDTO;
+import com.p5.adoptionsapi.service.DTO.DogDTO;
+import com.p5.adoptionsapi.service.DTO.ListDTO;
+import com.p5.adoptionsapi.service.DTO.ShelterDTO;
+import com.p5.adoptionsapi.service.adapters.CatAdapter;
+import com.p5.adoptionsapi.service.adapters.DogAdapter;
+import com.p5.adoptionsapi.service.adapters.ShelterAdapter;
 import org.springframework.stereotype.Service;
 
 
@@ -22,27 +29,35 @@ public class AnimalShelterService {
         this.animalShelterRepository = animalShelterRepository;
     }
 
-    public List<AnimalShelter> findAll() {
-        return animalShelterRepository.findAll();
+    public ListDTO<ShelterDTO> findAll() {
+        List<ShelterDTO>data=ShelterAdapter.toDTOList(animalShelterRepository.findAll());
+        Long totalCount= animalShelterRepository.count();
+        ListDTO<ShelterDTO> response=new ListDTO<>();
+        response.setData(data);
+        response.setTotalCount(totalCount);
+        return response;
     }
 
 
-    public AnimalShelter createShelter(AnimalShelter animalShelter) {
-        return animalShelterRepository.save(animalShelter);
+    public ShelterDTO createShelter(ShelterDTO shelterDTO) {
+        AnimalShelter shelter=ShelterAdapter.fromDTO(shelterDTO);
+        AnimalShelter savedShelter= animalShelterRepository.save(shelter);
+        return ShelterAdapter.toDTO(savedShelter);
     }
 
 
-    public AnimalShelter updateShelter(Integer id, AnimalShelter animalShelter) {
+    public ShelterDTO updateShelter(Integer id, ShelterDTO shelterDTO) {
         AnimalShelter shelter = getShelterById(id);
-        if (!shelter.getId().equals(animalShelter.getId())) {
+        if (!shelter.getId().equals(shelterDTO.getId())) {
             throw new RuntimeException("Id of entity not the same with path id");
         }
-        return animalShelterRepository.save(animalShelter);
+        return ShelterAdapter.toDTO(animalShelterRepository.save(ShelterAdapter.fromDTO(shelterDTO)));
     }
 
-
-    public AnimalShelter findById(Integer id) {
-        return getShelterById(id);
+//******
+    public ShelterDTO findById(Integer id) {
+        AnimalShelter shelter= getShelterById(id);
+        return ShelterAdapter.toDTO(shelter);
     }
 
 
@@ -59,24 +74,24 @@ public class AnimalShelterService {
 
 //CRUD for Cat
 
-    public List<Cat> findAllCatsByShelter(Integer id) {
+    public List<CatDTO> findAllCatsByShelter(Integer id) {
         AnimalShelter shelter = getShelterById(id);
-        return shelter.getCats();
+        return CatAdapter.toDTOList(shelter.getCats());
     }
 
 
-    public List<Cat> findCatById(Integer shelterId, Integer catId) {
+    public List<CatDTO> findCatById(Integer shelterId, Integer catId) {
         AnimalShelter shelter = getShelterById(shelterId);
         List<Cat> newCats = shelter.getCats().stream().filter(c ->
                 c.getId().equals(catId)).collect(Collectors.toList());
-        return newCats;
+        return CatAdapter.toDTOList(newCats);
     }
 
-    public List<Cat> addNewCat(Integer shelterId, Cat cat) {
+    public List<CatDTO> addNewCat(Integer shelterId, CatDTO catDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
-        shelter.getCats().add(cat);
+        shelter.getCats().add(CatAdapter.fromDTO(catDTO));
         animalShelterRepository.save(shelter);
-        return shelter.getCats();
+        return CatAdapter.toDTOList(shelter.getCats());
     }
 
 
@@ -87,8 +102,9 @@ public class AnimalShelterService {
         animalShelterRepository.save(shelter);
     }
 
-    public Cat updateCatInShelter(Integer shelterId, Integer catId, Cat cat) {
+    public CatDTO updateCatInShelter(Integer shelterId, Integer catId, CatDTO catDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
+        Cat cat=CatAdapter.fromDTO(catDTO);
         List<Cat> newCats = shelter.getCats().stream().map(c -> {
             if (c.getId().equals(catId)) {
                 cat.setId(catId);
@@ -98,30 +114,30 @@ public class AnimalShelterService {
         }).collect(Collectors.toList());
         shelter.setCats(newCats);
         animalShelterRepository.save(shelter);
-        return cat;
+        return CatAdapter.toDTO(cat);
     }
 
 
 //CRUD  for Dog
 
-    public List<Dog> findAllDogByShelter(Integer id) {
+    public List<DogDTO> findAllDogByShelter(Integer id) {
         AnimalShelter shelter = getShelterById(id);
-        return shelter.getDogs();
+        return DogAdapter.toDTOList(shelter.getDogs());
     }
 
 
-    public List<Dog> findDogById(Integer shelterId, Integer dogId) {
+    public List<DogDTO> findDogById(Integer shelterId, Integer dogId) {
         AnimalShelter shelter = getShelterById(shelterId);
         List<Dog> newDog = shelter.getDogs().stream().filter(c ->
                 c.getId().equals(dogId)).collect(Collectors.toList());
-        return newDog;
+        return DogAdapter.toDTOList(newDog);
     }
 
-    public List<Dog> addNewDog(Integer shelterId, Dog dog) {
+    public List<DogDTO> addNewDog(Integer shelterId, DogDTO dogDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
-        shelter.getDogs().add(dog);
+        shelter.getDogs().add(DogAdapter.fromDTO(dogDTO));
         animalShelterRepository.save(shelter);
-        return shelter.getDogs();
+        return DogAdapter.toDTOList(shelter.getDogs());
     }
 
 
@@ -132,8 +148,9 @@ public class AnimalShelterService {
         animalShelterRepository.save(shelter);
     }
 
-    public Dog updateDogInShelter(Integer shelterId, Integer dogId, Dog dog) {
+    public DogDTO updateDogInShelter(Integer shelterId, Integer dogId, DogDTO dogDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
+        Dog dog=DogAdapter.fromDTO(dogDTO);
         List<Dog> newDogs = shelter.getDogs().stream().map(c -> {
             if (c.getId().equals(dogId)) {
                 dog.setId(dogId);
@@ -143,6 +160,6 @@ public class AnimalShelterService {
         }).collect(Collectors.toList());
         shelter.setDogs(newDogs);
         animalShelterRepository.save(shelter);
-        return dog;
+        return DogAdapter.toDTO(dog);
     }
 }
