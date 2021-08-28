@@ -1,12 +1,19 @@
 package com.p5.adoptionsapi.service.DTO;
 
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShelterDTO {
-
+@Null
+@NotBlank
     private Integer id;
+
     private String name;
     private List<CatDTO> cats = new ArrayList<>();
     private List<DogDTO> dogs = new ArrayList<>();

@@ -1,18 +1,14 @@
 package com.p5.adoptionsapi.api.controllers;
 
-import com.p5.adoptionsapi.repository.animal.Animal;
-import com.p5.adoptionsapi.repository.animal.AnimalRepository;
-import com.p5.adoptionsapi.repository.cats.Cat;
-import com.p5.adoptionsapi.repository.dogs.Dog;
-import com.p5.adoptionsapi.repository.shelters.AnimalShelter;
+
 import com.p5.adoptionsapi.service.AnimalShelterService;
 import com.p5.adoptionsapi.service.DTO.CatDTO;
 import com.p5.adoptionsapi.service.DTO.DogDTO;
 import com.p5.adoptionsapi.service.DTO.ListDTO;
 import com.p5.adoptionsapi.service.DTO.ShelterDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +36,7 @@ public class AnimalShelterController {
     }
 
     @PostMapping()
-    public ResponseEntity<ShelterDTO> createShelter(@RequestBody ShelterDTO shelterDTO) {
+    public ResponseEntity<ShelterDTO> createShelter(@Validated @RequestBody ShelterDTO shelterDTO) {
         return ResponseEntity.ok(animalShelterService.createShelter(shelterDTO));
     }
 
