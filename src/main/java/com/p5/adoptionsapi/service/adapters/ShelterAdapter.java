@@ -12,8 +12,8 @@ public class ShelterAdapter {
         return new ShelterDTO()
                 .setId(shelter.getId())
                 .setName(shelter.getName())
-                .setCats(CatAdapter.toDTOList(shelter.getCats()));
-        //s;
+                .setCats(CatAdapter.toDTOList(shelter.getCats()))
+                .setDogs(DogAdapter.toDTOList(shelter.getDogs()));
     }
 
     public static AnimalShelter fromDTO(ShelterDTO shelterDTO) {
@@ -21,7 +21,7 @@ public class ShelterAdapter {
         shelter.setId(shelterDTO.getId());
         shelter.setName(shelterDTO.getName());
         shelter.setCats(CatAdapter.fromDTOList(shelterDTO.getCats()));
-        //s;
+        shelter.setDogs(DogAdapter.fromDTOList(shelterDTO.getDogs()));
         return shelter;
     }
 

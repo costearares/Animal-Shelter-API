@@ -1,20 +1,28 @@
 package com.p5.adoptionsapi.service.DTO;
 
 
+import com.p5.adoptionsapi.service.validations.OnCreate;
+import com.p5.adoptionsapi.service.validations.OnUpdate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShelterDTO {
-@Null
-@NotBlank
+    @Null(message = "Id must be null for creation",groups = OnCreate.class)
+    @NotNull (message = "Id must have value for update",groups = OnUpdate.class)
+    @Min(value = 1, groups = OnUpdate.class)
     private Integer id;
 
+    @NotNull
+    @NotBlank
     private String name;
+
     private List<CatDTO> cats = new ArrayList<>();
     private List<DogDTO> dogs = new ArrayList<>();
 

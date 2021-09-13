@@ -11,15 +11,24 @@ import com.p5.adoptionsapi.service.DTO.ShelterDTO;
 import com.p5.adoptionsapi.service.adapters.CatAdapter;
 import com.p5.adoptionsapi.service.adapters.DogAdapter;
 import com.p5.adoptionsapi.service.adapters.ShelterAdapter;
+import com.p5.adoptionsapi.service.exceptions.ApiError;
+import com.p5.adoptionsapi.service.exceptions.ValidationException;
+import com.p5.adoptionsapi.service.exceptions.Violation;
+import com.p5.adoptionsapi.service.validations.OnCreate;
+import com.p5.adoptionsapi.service.validations.OnUpdate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Validated
 public class AnimalShelterService {
 
 
@@ -38,15 +47,31 @@ public class AnimalShelterService {
         return response;
     }
 
-
-    public ShelterDTO createShelter(ShelterDTO shelterDTO) {
-        AnimalShelter shelter=ShelterAdapter.fromDTO(shelterDTO);
-        AnimalShelter savedShelter= animalShelterRepository.save(shelter);
-        return ShelterAdapter.toDTO(savedShelter);
+@Validated(OnCreate.class)
+    public ShelterDTO createShelter(@Valid ShelterDTO animalShelter) {
+        AnimalShelter shelter=ShelterAdapter.fromDTO(animalShelter);
+        return ShelterAdapter.toDTO(animalShelterRepository.save(shelter));
     }
 
+    private void validateShelter(ShelterDTO shelterDTO){
+        ApiError error =new ApiError(HttpStatus.CONFLICT, "Shelter validation failed");
 
-    public ShelterDTO updateShelter(Integer id, ShelterDTO shelterDTO) {
+        if (shelterDTO.getDogs().isEmpty()){
+            error.getViolations().add(new Violation("dogs", "minimum 1 dog pls"));
+        }
+        if (shelterDTO.getName().contains("_")){
+            error.getViolations().add(new Violation("name", "No underscore in name"));
+        }
+
+        if (!error.getViolations().isEmpty()){
+            throw new ValidationException(error);
+        }
+    }
+
+@Validated(OnUpdate.class)
+    public ShelterDTO updateShelter(Integer id, @Valid ShelterDTO shelterDTO) {
+        validateShelter(shelterDTO);
+
         AnimalShelter shelter = getShelterById(id);
         if (!shelter.getId().equals(shelterDTO.getId())) {
             throw new RuntimeException("Id of entity not the same with path id");
