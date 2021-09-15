@@ -7,13 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/moderators")
-@PreAuthorize("isAuthenticated() && hasRole('MOD')")
-
-public class ModeratorController {
+//@PreAuthorize("isAuthenticated() && hasRole('MOD')")
+public class ModeratorController
+{
 
     @GetMapping("/hello")
-    public String hello() {
-        return "hello Moderator";
+   // @PreAuthorize("principal.username.startsWith('animal')")
+    public String hello()
+    {
+        return "Hello Moderator!";
     }
-
 }

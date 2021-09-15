@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ShelterDTO {
     @Null(message = "Id must be null for creation",groups = OnCreate.class)
@@ -22,6 +23,7 @@ public class ShelterDTO {
     @NotNull
     @NotBlank
     private String name;
+    private String location;
 
     private List<CatDTO> cats = new ArrayList<>();
     private List<DogDTO> dogs = new ArrayList<>();
@@ -29,9 +31,10 @@ public class ShelterDTO {
     public ShelterDTO() {
     }
 
-    public ShelterDTO(Integer id, String name, List<CatDTO> cats, List<DogDTO> dogs) {
+    public ShelterDTO(Integer id, String name, String location, List<CatDTO> cats, List<DogDTO> dogs) {
         this.id = id;
         this.name = name;
+        this.location = location;
         this.cats = cats;
         this.dogs = dogs;
     }
@@ -70,5 +73,27 @@ public class ShelterDTO {
     public ShelterDTO setDogs(List<DogDTO> dogs) {
         this.dogs = dogs;
         return this;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public ShelterDTO setLocation(String location) {
+        this.location = location;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShelterDTO that = (ShelterDTO) o;
+        return id.equals(that.id) && name.equals(that.name) && location.equals(that.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, location);
     }
 }

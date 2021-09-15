@@ -15,7 +15,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
@@ -26,35 +25,36 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     ApiError onConstraintValidationException(ConstraintViolationException ex) {
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "Arguments validation faild");
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "Arguments validation failed");
+
         for (ConstraintViolation violation : ex.getConstraintViolations()) {
             error.getViolations().add(new Violation(violation.getPropertyPath().toString(), violation.getMessage(), String.valueOf(violation.getInvalidValue())));
         }
+
         return error;
     }
-
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return new ResponseEntity<>(new ApiError(HttpStatus.CONFLICT, ex.getMessage()), status);
     }
 
-
-
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
-    ApiError onValidationException (ValidationException ex){
+    ApiError onValidationException(ValidationException ex) {
         return ex.getApiError();
     }
 
-   /* @ExceptionHandler(ShelterLocationException.class)
+
+    @ExceptionHandler(ShelterLocationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     ApiError onShelterLocationException(ShelterLocationException ex) {
         return new ApiError(HttpStatus.EXPECTATION_FAILED, ex.getMessage());
-    }*/
+    }
+
 }

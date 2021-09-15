@@ -12,6 +12,7 @@ import com.p5.adoptionsapi.service.adapters.CatAdapter;
 import com.p5.adoptionsapi.service.adapters.DogAdapter;
 import com.p5.adoptionsapi.service.adapters.ShelterAdapter;
 import com.p5.adoptionsapi.service.exceptions.ApiError;
+import com.p5.adoptionsapi.service.exceptions.ShelterLocationException;
 import com.p5.adoptionsapi.service.exceptions.ValidationException;
 import com.p5.adoptionsapi.service.exceptions.Violation;
 import com.p5.adoptionsapi.service.validations.OnCreate;
@@ -24,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,37 +41,47 @@ public class AnimalShelterService {
     }
 
     public ListDTO<ShelterDTO> findAll() {
-        List<ShelterDTO>data=ShelterAdapter.toDTOList(animalShelterRepository.findAll());
-        Long totalCount= animalShelterRepository.count();
-        ListDTO<ShelterDTO> response=new ListDTO<>();
+        List<ShelterDTO> data = ShelterAdapter.toDTOList(animalShelterRepository.findAll());
+        Long totalCount = animalShelterRepository.count();
+        ListDTO<ShelterDTO> response = new ListDTO<>();
         response.setData(data);
         response.setTotalCount(totalCount);
         return response;
     }
 
-@Validated(OnCreate.class)
+    @Validated(OnCreate.class)
     public ShelterDTO createShelter(@Valid ShelterDTO animalShelter) {
-        AnimalShelter shelter=ShelterAdapter.fromDTO(animalShelter);
+        validateShelterLocation(animalShelter);
+
+        AnimalShelter shelter = ShelterAdapter.fromDTO(animalShelter);
         return ShelterAdapter.toDTO(animalShelterRepository.save(shelter));
     }
 
-    private void validateShelter(ShelterDTO shelterDTO){
-        ApiError error =new ApiError(HttpStatus.CONFLICT, "Shelter validation failed");
+    public void validateShelterLocation(ShelterDTO animalShelter) {
+        String location = animalShelter.getLocation().toLowerCase(Locale.ROOT);
+        if (!location.contains("brasov") && !location.contains("iasi")) {
+            throw new ShelterLocationException("Brasov or Iasi is required");
+        }
+    }
 
-        if (shelterDTO.getDogs().isEmpty()){
+    private void validateShelter(ShelterDTO shelterDTO) {
+        ApiError error = new ApiError(HttpStatus.CONFLICT, "Shelter validation failed");
+
+        if (shelterDTO.getDogs().isEmpty()) {
             error.getViolations().add(new Violation("dogs", "minimum 1 dog pls"));
         }
-        if (shelterDTO.getName().contains("_")){
+        if (shelterDTO.getName().contains("_")) {
             error.getViolations().add(new Violation("name", "No underscore in name"));
         }
 
-        if (!error.getViolations().isEmpty()){
+        if (!error.getViolations().isEmpty()) {
             throw new ValidationException(error);
         }
     }
 
-@Validated(OnUpdate.class)
+    @Validated(OnUpdate.class)
     public ShelterDTO updateShelter(Integer id, @Valid ShelterDTO shelterDTO) {
+        validateShelterLocation(shelterDTO);
         validateShelter(shelterDTO);
 
         AnimalShelter shelter = getShelterById(id);
@@ -79,9 +91,9 @@ public class AnimalShelterService {
         return ShelterAdapter.toDTO(animalShelterRepository.save(ShelterAdapter.fromDTO(shelterDTO)));
     }
 
-//******
+    //******
     public ShelterDTO findById(Integer id) {
-        AnimalShelter shelter= getShelterById(id);
+        AnimalShelter shelter = getShelterById(id);
         return ShelterAdapter.toDTO(shelter);
     }
 
@@ -129,7 +141,7 @@ public class AnimalShelterService {
 
     public CatDTO updateCatInShelter(Integer shelterId, Integer catId, CatDTO catDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
-        Cat cat=CatAdapter.fromDTO(catDTO);
+        Cat cat = CatAdapter.fromDTO(catDTO);
         List<Cat> newCats = shelter.getCats().stream().map(c -> {
             if (c.getId().equals(catId)) {
                 cat.setId(catId);
@@ -175,7 +187,7 @@ public class AnimalShelterService {
 
     public DogDTO updateDogInShelter(Integer shelterId, Integer dogId, DogDTO dogDTO) {
         AnimalShelter shelter = getShelterById(shelterId);
-        Dog dog=DogAdapter.fromDTO(dogDTO);
+        Dog dog = DogAdapter.fromDTO(dogDTO);
         List<Dog> newDogs = shelter.getDogs().stream().map(c -> {
             if (c.getId().equals(dogId)) {
                 dog.setId(dogId);

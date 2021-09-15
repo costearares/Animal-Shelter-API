@@ -11,18 +11,22 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class AdoptionRoleHierarchy extends GlobalMethodSecurityConfiguration {
+public class AdoptionRoleHierarchy extends GlobalMethodSecurityConfiguration
+{
+
 
     @Bean
-    public RoleHierarchy roleHierarchy(){
-        RoleHierarchyImpl roleHierarchy= new RoleHierarchyImpl();
+    public RoleHierarchy roleHierarchy()
+    {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MOD \n ROLE_MOD > ROLE_USER");
         return roleHierarchy;
     }
 
     @Override
-    protected MethodSecurityExpressionHandler createExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler handler=new DefaultMethodSecurityExpressionHandler();
+    protected MethodSecurityExpressionHandler createExpressionHandler()
+    {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
         handler.setRoleHierarchy(roleHierarchy());
         return handler;
     }

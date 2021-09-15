@@ -12,6 +12,7 @@ public class ShelterAdapter {
         return new ShelterDTO()
                 .setId(shelter.getId())
                 .setName(shelter.getName())
+                .setLocation(shelter.getLocation())
                 .setCats(CatAdapter.toDTOList(shelter.getCats()))
                 .setDogs(DogAdapter.toDTOList(shelter.getDogs()));
     }
@@ -20,6 +21,7 @@ public class ShelterAdapter {
         AnimalShelter shelter = new AnimalShelter();
         shelter.setId(shelterDTO.getId());
         shelter.setName(shelterDTO.getName());
+        shelter.setLocation(shelterDTO.getLocation());
         shelter.setCats(CatAdapter.fromDTOList(shelterDTO.getCats()));
         shelter.setDogs(DogAdapter.fromDTOList(shelterDTO.getDogs()));
         return shelter;

@@ -16,6 +16,7 @@ public class AnimalShelter {
     private Integer id;
     @Column(unique = true)
     private String name;
+    private String location;
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -60,6 +61,15 @@ public class AnimalShelter {
 
     public AnimalShelter setDogs(List<Dog> dogs) {
         this.dogs = dogs;
+        return this;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public AnimalShelter setLocation(String location) {
+        this.location = location;
         return this;
     }
 }
